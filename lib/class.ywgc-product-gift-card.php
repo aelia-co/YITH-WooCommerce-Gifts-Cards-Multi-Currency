@@ -16,17 +16,17 @@ if ( ! class_exists ( 'WC_Product_Gift_Card' ) ) {
         /*
          * Minimum amount from the gift card amount list
          */
-        private $min_price = null;
+        public $min_price = null;
 
         /*
          * Maximum amount from the gift card amount list
          */
-        private $max_price = null;
+        public $max_price = null;
 
         /**
          * @var gift card amount list
          */
-        private $amounts;
+        public $amounts;
 
         /**
          * @var gift card amounts count

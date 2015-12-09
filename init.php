@@ -5,7 +5,7 @@ Plugin URI: https://yithemes.com/themes/plugins/yith-woocommerce-gift-cards/
 Description: Allow your users to purchase and give gift cards, an easy and direct way to encourage new sales.
 Author: Yithemes
 Text Domain: yith-woocommerce-gift-cards
-Version: 1.0.5
+Version: 1.0.6
 Author URI: http://yithemes.com/
 */
 
@@ -50,7 +50,7 @@ if ( ! defined ( 'YITH_YWGC_FREE_INIT' ) ) {
 }
 
 if ( ! defined ( 'YITH_YWGC_VERSION' ) ) {
-    define ( 'YITH_YWGC_VERSION', '1.0.5' );
+    define ( 'YITH_YWGC_VERSION', '1.0.6' );
 }
 
 if ( ! defined ( 'YITH_YWGC_DB_VERSION' ) ) {

@@ -40,6 +40,51 @@ if ( ! class_exists ( 'YITH_WooCommerce_Gift_Cards' ) ) {
         /** @var YWGC_Gift_Cards $gift_cards_instance */
         private $gift_cards_instance;
 
+				/**
+				 * Shop's base currency. Used for caching.
+				 * @var string
+				 * @since 1.0.7
+				 */
+				protected static $base_currency;
+
+				/**
+				 * Convenience method. Returns WooCommerce base currency.
+				 *
+				 * @return string
+				 * @since 1.0.7
+				 */
+				public static function base_currency() {
+					if(empty(self::$base_currency)) {
+						self::$base_currency = get_option('woocommerce_currency');
+					}
+					return self::$base_currency;
+				}
+
+				/**
+				 * Basic integration with WooCommerce Currency Switcher, developed by Aelia
+				 * (https://aelia.co). This method can be used by any 3rd party plugin to
+				 * return prices converted to the active currency.
+				 *
+				 * @param double amount The source price.
+				 * @param string to_currency The target currency. If empty, the active currency
+				 * will be taken.
+				 * @param string from_currency The source currency. If empty, WooCommerce base
+				 * currency will be taken.
+				 * @return double The price converted from source to destination currency.
+				 * @author Aelia <support@aelia.co>
+				 * @link https://aelia.co
+				 * @since 1.0.7
+				 */
+				public static function get_amount_in_currency($amount, $to_currency = null, $from_currency = null) {
+					if(empty($from_currency)) {
+						$from_currency = self::base_currency();
+					}
+					if(empty($to_currency)) {
+						$to_currency = get_woocommerce_currency();
+					}
+					return apply_filters('wc_aelia_cs_convert', $amount, $from_currency, $to_currency);
+				}
+
         /**
          * Constructor
          *
@@ -124,6 +169,11 @@ if ( ! class_exists ( 'YITH_WooCommerce_Gift_Cards' ) ) {
             add_action ( 'woocommerce_after_checkout_validation', array ( $this, 'woocommerce_after_checkout_validation' ) );
 
             add_filter ( 'woocommerce_update_cart_action_cart_updated', array ( $this, 'woocommerce_update_cart_action_cart_updated' ) );
+
+						/* Aelia
+						 * Multi-currency support
+						 */
+						add_filter('wc_aelia_currencyswitcher_product_convert_callback', array ( $this, 'wc_aelia_currencyswitcher_product_convert_callback' ), 10, 2 );
         }
 
 
@@ -576,5 +626,47 @@ if ( ! class_exists ( 'YITH_WooCommerce_Gift_Cards' ) ) {
 
             return $cart_udated;
         }
-    }
+
+				/**
+				 * Callback to support currency conversion of Gift Card products.
+				 *
+				 * @param callable callback The original callback passed by the Currency
+				 * Switcher.
+				 * @param WC_Product product The product to convers.
+				 * @return callable The callback that will perform the conversion.
+				 * @since 1.0.6
+				 * @author Aelia <support@aelia.co>
+				 */
+				public function wc_aelia_currencyswitcher_product_convert_callback($callback, $product) {
+					//var_dump($product);die();
+
+					if($product instanceof WC_Product_Gift_Card) {
+						$callback = array($this, 'convert_gift_card_prices');
+					}
+					return $callback;
+				}
+
+				/**
+				 * Converts the prices of a gift card product to the specified currency.
+				 *
+				 * @param WC_Product_Gift_Card product A variable product.
+				 * @param string currency A currency code.
+				 * @return WC_Product_Gift_Card The product with converted prices.
+				 * @since 1.0.6
+				 * @author Aelia <support@aelia.co>
+				 */
+				public function convert_gift_card_prices($product, $currency) {
+					$product->min_price = $this->get_amount_in_currency($product->min_price);
+					$product->max_price = $this->get_amount_in_currency($product->max_price);
+
+					foreach($product->amounts as $idx => $amount) {
+						$product->amounts[$idx] = $this->get_amount_in_currency($product->amounts[$idx]);
+					}
+					if(!empty($product->price)) {
+						$product->price = $this->get_amount_in_currency($product->price);
+					}
+
+					return $product;
+				}
+			}
 }
