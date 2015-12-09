@@ -43,7 +43,7 @@ if ( ! class_exists ( 'YITH_WooCommerce_Gift_Cards' ) ) {
 				/**
 				 * Shop's base currency. Used for caching.
 				 * @var string
-				 * @since 1.0.7
+				 * @since 1.0.6
 				 */
 				protected static $base_currency;
 
@@ -51,7 +51,7 @@ if ( ! class_exists ( 'YITH_WooCommerce_Gift_Cards' ) ) {
 				 * Convenience method. Returns WooCommerce base currency.
 				 *
 				 * @return string
-				 * @since 1.0.7
+				 * @since 1.0.6
 				 */
 				public static function base_currency() {
 					if(empty(self::$base_currency)) {
@@ -73,7 +73,7 @@ if ( ! class_exists ( 'YITH_WooCommerce_Gift_Cards' ) ) {
 				 * @return double The price converted from source to destination currency.
 				 * @author Aelia <support@aelia.co>
 				 * @link https://aelia.co
-				 * @since 1.0.7
+				 * @since 1.0.6
 				 */
 				public static function get_amount_in_currency($amount, $to_currency = null, $from_currency = null) {
 					if(empty($from_currency)) {
